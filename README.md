@@ -27,7 +27,7 @@ XXE_Master is a powerful tool designed for detecting, exploiting, and reporting 
 ### Installation Steps
 1. Clone the repository: `git clone https://github.com/uwimanaMuhiziElie/xxe_master.git`
 2. Navigate to the project directory: `cd xxe_master`
-3. Install XXE_Master: `pip install -r setup.py`
+3. Install XXE_Master: `python setup.py install`
 
 ## Usage
 - For usage instructions, run `python main.py --help`

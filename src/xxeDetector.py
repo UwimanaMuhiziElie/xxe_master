@@ -6,7 +6,7 @@ import logging
 import concurrent.futures
 from pathlib import Path
 from requests.exceptions import RequestException
-from payloads.payloads import Payloads
+from payloads.payloads import Payloads  # Updated import path
 
 logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
 
@@ -22,14 +22,14 @@ class XXEDetector:
             response = requests.post(self.target_url, data=f'<data>{payload}</data>', headers=headers)
             return response.text
         except RequestException as e:
-            logging.error(f"Failed to send request: {e}")
+            logging.error(f"[!] Failed to send request: {e}")
             return None
 
     def is_xxe_detected(self, response):
         try:
             response = self.decode_response(response)
         except Exception as e:
-            logging.error(f"Error decoding response: {e}")
+            logging.error(f"[!] Error decoding response: {e}")
             return False
 
         xxe_patterns = [
@@ -42,7 +42,7 @@ class XXEDetector:
 
         for pattern in xxe_patterns:
             if re.search(pattern, response, re.IGNORECASE):
-                logging.debug("XXE detected using pattern: {}".format(pattern))
+                logging.debug("[+] XXE detected using pattern: {}".format(pattern))
                 return True
         return False
 
@@ -51,7 +51,7 @@ class XXEDetector:
             response = urllib.parse.unquote(response)
             response = base64.b64decode(response).decode('utf-8', errors='ignore')
         except Exception as e:
-            raise Exception(f"Error decoding response: {e}")
+            raise Exception(f"[!] Error decoding response: {e}")
 
         return response
 
@@ -62,27 +62,27 @@ class XXEDetector:
         return None
 
     def detect_xxe_vulnerabilities(self, attacker_url):
-        logging.info("Starting XXE vulnerability detection using concurrent execution...")
+        logging.info("[*] Starting XXE vulnerability detection using concurrent execution...")
         with concurrent.futures.ThreadPoolExecutor(max_workers=10) as executor:
             results = list(executor.map(self.send_and_detect, [payload.replace("{{TARGET_URL}}", self.target_url).replace("{{ATTACKER_URL}}", attacker_url) for _, payloads in self.payloads.items() for payload in payloads]))
 
         for result in results:
             if result:
-                logging.info(f"Vulnerability detected with payload: {result['payload']}")
+                logging.info(f"[+] Vulnerability detected with payload: {result['payload']}")
                 self.vulnerabilities.append({'type': 'Detected', 'payload': result['payload'], 'response': result['response']})
 
         return self.vulnerabilities
 
     def exploit_xxe(self, payload):
-        logging.info(f"Attempting to exploit with payload: {payload}")
+        logging.info(f"[*] Attempting to exploit with payload: {payload}")
         response = self.send_request(payload)
-        print("Exploitation Result:")
+        print("[*] Exploitation Result:")
         print(response)
         print("=" * 50)
 
     def exploit_detected_vulnerabilities(self):
         if self.vulnerabilities:
-            logging.info("Exploiting detected XXE vulnerabilities:")
+            logging.info("[+] Exploiting detected XXE vulnerabilities:")
             for vulnerability in self.vulnerabilities:
                 self.exploit_xxe(vulnerability['payload'])
 
@@ -98,7 +98,7 @@ class XXEDetector:
             self.save_report(report_content)
 
         else:
-            print("No XXE vulnerabilities detected.")
+            print("[!] No XXE vulnerabilities detected.")
 
     def save_report(self, report_data, filename="XXE_Report.txt"):
         home = Path.home()
@@ -108,4 +108,4 @@ class XXEDetector:
         
         with report_path.open('w', encoding='utf-8') as report_file:
             report_file.write(report_data)
-        print(f"Report saved to: {report_path}")
+        print(f"[**] Report saved to: {report_path}")

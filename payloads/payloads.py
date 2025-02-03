@@ -1,4 +1,6 @@
 import json
+import base64
+import re
 from config.logger_config import setup_logging
 from pathlib import Path
 
@@ -36,3 +38,36 @@ class Payloads:
             self.logger.info("Payloads saved successfully")
         except Exception as e:
             self.logger.error(f"Failed to save payloads to {self.filepath}: {e}")
+
+    def obfuscate_payload(self, payload, encoding_type):
+        try:
+            if encoding_type == 'base64':
+                return base64.b64encode(payload.encode()).decode()
+            elif encoding_type == 'unicode':
+                return ''.join(f"\\u{ord(c):04x}" for c in payload)
+            elif encoding_type == 'decimal':
+                return ''.join(f"&#{ord(c)};" for c in payload)
+            elif encoding_type == 'octal':
+                return ''.join(f"\\{oct(ord(c))[2:]}" for c in payload)
+            elif encoding_type == 'hex':
+                return ''.join(f"&#x{ord(c):02x};" for c in payload)
+            elif encoding_type == 'dword':
+                if re.match(r'\d+\.\d+\.\d+\.\d+', payload): 
+                    return payload.replace('127.0.0.1', '2130706433')
+                else:
+                    self.logger.error("Dword encoding is only applicable to IP addresses.")
+                    return payload
+            else:
+                self.logger.error(f"Unknown encoding type: {encoding_type}")
+                return payload
+        except Exception as e:
+            self.logger.error(f"Error obfuscating payload with {encoding_type}: {e}")
+            return payload
+
+    def apply_obfuscation(self, payload, encoding_types):
+        obfuscated_payloads = []
+        for encoding in encoding_types:
+            obfuscated_payload = self.obfuscate_payload(payload, encoding)
+            self.logger.info(f"Applied {encoding} encoding: {obfuscated_payload}")
+            obfuscated_payloads.append(obfuscated_payload)
+        return obfuscated_payloads

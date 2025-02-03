@@ -1,15 +1,15 @@
 import socket
 import logging
-from config.logger_config import setup_logging  # Updated import path
+from config.logger_config import setup_logging 
 
 class OutOfBandListener:
     def __init__(self, listen_host, listen_port, allowed_ips=None):
         self.listen_host = listen_host
         self.listen_port = listen_port
-        self.allowed_ips = allowed_ips or []  # List of allowed IPs; empty list means allow all
+        self.allowed_ips = allowed_ips or [] 
         self.server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.server_socket.bind((listen_host, listen_port))
-        self.server_socket.listen(5)  # Allow up to 5 queued connections
+        self.server_socket.listen(5)
         self.logger = setup_logging()
         self.logger.info(f"Listening on {listen_host}:{listen_port} for out-of-band interactions...")
 
@@ -29,7 +29,7 @@ class OutOfBandListener:
 
     def is_ip_allowed(self, client_ip):
         if not self.allowed_ips:
-            return True  # Allow all if no IP restrictions are set
+            return True 
         return client_ip in self.allowed_ips
 
     def handle_client(self, client_socket, client_address):
@@ -44,7 +44,7 @@ class OutOfBandListener:
     def receive_all_data(self, client_socket):
         data_chunks = []
         while True:
-            chunk = client_socket.recv(4096)  # Receive data in chunks of 4096 bytes
+            chunk = client_socket.recv(4096) 
             if not chunk:
                 break
             data_chunks.append(chunk)

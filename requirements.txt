@@ -1,0 +1,5 @@
+requests>=2.28.1  # For HTTP requests
+pyfiglet>=0.8.post1  # For ASCII art banners
+colorama>=0.4.6  # For colored terminal output
+Flask>=2.2.2  # For the built-in attacker server
+concurrent-log-handler>=0.9.19  # For improved logging in multithreaded environments

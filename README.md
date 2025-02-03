@@ -2,6 +2,8 @@
 
 ![xmaster-logo](logo.png)
 
+## 📜 Description
+
 XXE_Master is a powerful tool designed to detect, and exploit a wide range of XML External Entities(XXE), including data exfiltration, file inclusion, SSRF, RCE, and XSS. it supports variety of attack vectors through its rich set of payloads designed  for both direct and blind XXE exploitation.It supports all operating systems (Linux Windows, and MacOS).
 
 ## Table of Contents
